@@ -12,19 +12,25 @@ app.use(express.urlencoded({ extended: true }))
 
 const { DynamoDBClient, ListTablesCommand } = require("@aws-sdk/client-dynamodb");
 
-(async () => {
-  console.log("Trying to Connect AWS Database.")
-  const client = new DynamoDBClient({ region: "ap-southeast-1" });
-  const command = new ListTablesCommand({});
-  try {
-    console.log("AWS Database Connected.")
-    const results = await client.send(command);
-    console.log(results.TableNames.join("\n"));
-  } catch (err) {
-    console.log("AWS Database Failed.")
-    console.error(err);
-  }
-})();
+
+
+app.use('*', (req, res) => {
+  (async () => {
+    console.log("Trying to Connect AWS Database.")
+    const client = new DynamoDBClient({ region: "ap-southeast-1" });
+    const command = new ListTablesCommand({});
+    try {
+      console.log("AWS Database Connected.")
+      const results = await client.send(command);
+      console.log(results.TableNames.join("\n"));
+      res.json({ msg: results.TableNames.join("\n") }).end()
+    } catch (err) {
+      console.log("AWS Database Failed.")
+      console.error(err);
+    }
+  })();
+
+})
 
 
 
