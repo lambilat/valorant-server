@@ -1,5 +1,5 @@
 
-//require('dotenv').config()
+require('dotenv').config()
 
 const express = require('express')
 const app = express()
@@ -9,10 +9,10 @@ const { DynamoDBClient, ListTablesCommand } = require("@aws-sdk/client-dynamodb"
 
 (async () => {
   const client = new DynamoDBClient({
-    region: "ap-southeast-1",
+    region: process.env.MY_REGION,
     credentials:{
-            accessKeyId: "AKIASVJKYFN7CQ6OVI4V",
-            secretAccessKey: "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"
+            accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY
         }
    });
   const command = new ListTablesCommand({});
@@ -29,6 +29,9 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.use('*', (req, res) => {
+  const timeElapsed = Date.now();
+  const today = new Date(timeElapsed);
+  console.log(today.toUTCString());
   res.json({ msg: 'WELCOME!' }).end()
 })
 
