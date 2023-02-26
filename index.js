@@ -17,9 +17,11 @@ const { DynamoDBClient, ListTablesCommand } = require("@aws-sdk/client-dynamodb"
   const client = new DynamoDBClient({ region: "ap-southeast-1" });
   const command = new ListTablesCommand({});
   try {
+    console.log("AWS Database Connected.")
     const results = await client.send(command);
     console.log(results.TableNames.join("\n"));
   } catch (err) {
+    console.log("AWS Database Failed.")
     console.error(err);
   }
 })();
