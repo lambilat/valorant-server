@@ -7,22 +7,27 @@ const port = process.env.PORT || 3000
 
 const { DynamoDBClient, ListTablesCommand } = require("@aws-sdk/client-dynamodb");
 
-(async () => {
-  const client = new DynamoDBClient({
-    region: process.env.MY_REGION,
-    credentials:{
-            accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY
-        }
-   });
-  const command = new ListTablesCommand({});
-  try {
-    const results = await client.send(command);
-    console.log(results.TableNames.join("\n"));
-  } catch (err) {
-    console.error(err);
-  }
-})();
+function backup(){
+  (async () => {
+    const client = new DynamoDBClient({
+      region: process.env.MY_REGION,
+      credentials:{
+              accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
+              secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY
+          }
+     });
+    const command = new ListTablesCommand({});
+    try {
+      const results = await client.send(command);
+      console.log(results.TableNames.join("\n"));
+    } catch (err) {
+      console.error(err);
+    }
+  })();
+}
+
+
+
 
 
 app.use(express.json())
