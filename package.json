@@ -1,16 +1,27 @@
 {
-  "name": "valorant-server",
-  "version": "1.0.0",
-  "description": "",
+  "name": "speedtest",
+  "version": "1.0.1",
+  "description": "Node.js speedtest",
   "main": "index.js",
   "scripts": {
-    "dev": "env-cmd nodemon index.js",
-    "repl": "env-cmd node"
+    "watch": "nodemon index.js",
+    "start": "node index.js",
+    "pm2": "sudo pm2 start index.js --name speedtest"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BetaHuhn/speedtest.git"
+  },
+  "author": "Maximilian Schiller",
+  "license": "MIT",
+  "homepage": "https://speedtest.mxis.ch",
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.279.0",
-    "dotenv": "^16.0.3",
-    "env-cmd": "^10.1.0",
-    "express": "^4.18.2"
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "helmet": "^3.23.0",
+    "signale": "^1.4.0",
+    "socket.io": "^2.3.0"
   }
 }

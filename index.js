@@ -1,46 +1,49 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+require('dotenv').config();
+const app = express();
+const cors = require('cors');
+const helmet = require('helmet');
+const crypto = require('crypto');
+const middleware = require("./middleware/middleware");
+const log = require("./utils/log");
+const appRouter = require('./router/app.js')
 
-require('dotenv').config()
+app.use(express.static('public'));
+app.use(express.json({ limit: '1mb' }));
+app.use(middleware.routeLog())
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(helmet());
+app.use(cors())
+app.use(appRouter)
 
-const express = require('express')
-const app = express()
-const port = process.env.PORT || 3000
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => log.success("listening on port " + PORT));
 
-const { DynamoDBClient, ListTablesCommand } = require("@aws-sdk/client-dynamodb");
+io.on('connection', function (socket) {
+    log.socket("connected")
 
-function backup(){
-  (async () => {
-    const client = new DynamoDBClient({
-      region: process.env.MY_REGION,
-      credentials:{
-              accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
-              secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY
-          }
-     });
-    const command = new ListTablesCommand({});
-    try {
-      const results = await client.send(command);
-      console.log(results.TableNames.join("\n"));
-    } catch (err) {
-      console.error(err);
-    }
-  })();
-}
+    socket.on('clientPing', (msg) => {
+        socket.emit('serverPong', msg)
+    });
 
+    socket.on('download', (chunkSize) => {
+        const data = crypto.randomBytes(chunkSize);
+        socket.emit('download', data);
+    });
 
+    socket.on('upload', (data) => {
+        socket.emit('upload', Date.now());
+    });
 
+    socket.on('disconnect', function () {
+        log.socket("disconnected");
+    })
+});
 
-
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-
-app.use('*', (req, res) => {
-  const timeElapsed = Date.now();
-  const today = new Date(timeElapsed);
-  console.log(today.toUTCString());
-  res.json({ msg: 'WELCOME!' }).end()
-})
-
-
-app.listen(port, () => {
-  console.log(`index.js listening on ${port}`)
-})
+app.use(function(req, res, next) {
+    res.sendStatus(404);
+});
